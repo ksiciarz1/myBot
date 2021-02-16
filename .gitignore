@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # JSON config file
-.json
+config.json
 
 # Img folder
 Resources.*
