@@ -105,3 +105,6 @@ dist
 
 # JSON config file
 .json
+
+# Img folder
+.Resources/
