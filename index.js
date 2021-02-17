@@ -1,8 +1,9 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const { prefix, token } = require('./config.json');
-var fs = require('fs');
+const { prefix, token, papierSwitch } = require('./config.json');
+const fs = require('fs');
 var splitedMessageContent;
+var papierSwitchLocal = papierSwitch;   
 
 const funcArray = {
     "help": message => {
@@ -17,7 +18,7 @@ const funcArray = {
                     messageToSend += ": Dokładnie ta komenda";
                     break;
                 case "papierz":
-                    messageToSend += ": Godzina bestii nadchodzi";
+                    messageToSend += ": Godzina bestii nadchodzi. Pozwala zmienić jej automatyczne świętowanie";
                     break;
                 case "cytat":
                     messageToSend += ": Wyświetla losowy cytat z kanału \"Cytaty\"";
@@ -68,35 +69,20 @@ const funcArray = {
         console.log("\ncytat - done\n");
     },
     "papierz": message => {
-        let data = new Date();
-        if (data.getHours() == 21 && ((data.getMinutes() - 37 > -1) && (data.getMinutes() - 37 < 1))) {
-            let pliki = fs.readdirSync('./Resources/Papier/');
-            let messegesToSend = ["Godzina bestii nadeszła !!", "2137", "Papierz z nami tańczy !!"];
-            let fileToSend = "./Resources/Papier/" + pliki[Math.floor(Math.random() * pliki.length)];
-
-            try {
-                message.channel.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
-                    console.log(error);
-                });
-            }
-            catch (err) {
-                console.log(err);
-            }
-            let smietnik = message.guild.channels.cache.find(ch => ch.id == "444469291748818944");
-            try {
-                smietnik.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
-                    console.log(error);
-                });
-            }
-            catch (err) {
-                console.log(err);
-            }
+        if (papierSwitchLocal) {
+            papierSwitchLocal = false;
+            message.channel.send("Wyłączono");
         }
         else {
-            message.channel.send("Godzina dopiero nadejdzie");
-            console.log("Godzin: " + data.getHours());
-            console.log("Minut: " + data.getMinutes());
+            papierSwitchLocal = true;
+            message.channel.send("Włączono");
         }
+        const fileName = "./config.json";
+        const file = require(fileName);
+        file.papierSwitch = papierSwitchLocal;
+        fs.writeFile(fileName, JSON.stringify(file, null, 2), function writeJSON(err) {
+            if (err) return console.log(err);
+        });
 
         console.log("papierz - done");
     }
@@ -107,6 +93,40 @@ client.login(token);
 client.once('ready', () => {
     console.log('Ready !\n\n');
     client.user.setActivity(prefix + "help", { type: "WATCHING" });
+
+    setInterval(() => {
+        if (papierSwitchLocal) {
+            let data = new Date();
+            if (data.getHours() == 21 && data.getMinutes() == 37) {
+                let pliki = fs.readdirSync('./Resources/Papier/');
+                let messegesToSend = ["Godzina bestii nadeszła !!", "2137", "Papierz z nami tańczy !!"];
+                let fileToSend = "./Resources/Papier/" + pliki[Math.floor(Math.random() * pliki.length)];
+
+                try {
+                    message.channel.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
+                        console.log(error);
+                    });
+                }
+                catch (err) {
+                    console.log(err);
+                }
+                let smietnik = message.guild.channels.cache.find(ch => ch.id == "444469291748818944");
+                try {
+                    smietnik.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
+                        console.log(error);
+                    });
+                }
+                catch (err) {
+                    console.log(err);
+                }
+            }
+            // else {
+            //     message.channel.send("Godzina dopiero nadejdzie");
+            //     console.log("Godzin: " + data.getHours());
+            //     console.log("Minut: " + data.getMinutes());
+            // }
+        }
+    }, 20000)
 });
 
 client.on('message', message => {
