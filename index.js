@@ -3,7 +3,7 @@ const client = new Discord.Client();
 const { prefix, token, papierSwitch } = require('./config.json');
 const fs = require('fs');
 var splitedMessageContent;
-var papierSwitchLocal = papierSwitch;   
+var papierSwitchLocal = papierSwitch;
 
 const funcArray = {
     "help": message => {
@@ -93,41 +93,35 @@ client.login(token);
 client.once('ready', () => {
     console.log('Ready !\n\n');
     client.user.setActivity(prefix + "help", { type: "WATCHING" });
+    let papierDoneAlready = false;
 
     setInterval(() => {
         if (papierSwitchLocal) {
-            let data = new Date();
-            if (data.getHours() == 21 && data.getMinutes() == 37) {
-                let plebaniaGuild = client.guilds.cache.find("442264233841786880");
-                let pliki = fs.readdirSync('./Resources/Papier/');
-                let messegesToSend = ["Godzina bestii nadeszła !!", "2137", "Papierz z nami tańczy !!"];
-                let fileToSend = "./Resources/Papier/" + pliki[Math.floor(Math.random() * pliki.length)];
-
-                // try {
-                //     message.channel.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
-                //         console.log(error);
-                //     });
-                // }
-                // catch (err) {
-                //     console.log(err);
-                // }
-                let smietnik = plebaniaGuild.channels.cache.find(ch => ch.id == "444469291748818944");
-                try {
-                    smietnik.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
-                        console.log(error);
-                    });
-                }
-                catch (err) {
-                    console.log(err);
+            if (!papierDoneAlready) {
+                let data = new Date();
+                if (data.getHours() == 21 && data.getMinutes() == 37) {
+                    console.log("Godzina bestii nadeszła !");
+                    let plebaniaGuild = client.guilds.cache.find(guild => guild.id == "442264233841786880");
+                    let pliki = fs.readdirSync('./Resources/Papier/');
+                    let messegesToSend = ["Godzina bestii nadeszła !!", "2137", "Papierz z nami tańczy !!"];
+                    let fileToSend = "./Resources/Papier/" + pliki[Math.floor(Math.random() * pliki.length)];
+                    let smietnik = plebaniaGuild.channels.cache.find(ch => ch.id == "444469291748818944");
+                    try {
+                        smietnik.send(messegesToSend[Math.floor(Math.random() * messegesToSend.length)], { files: [fileToSend] }).catch(error => {
+                            console.log(error);
+                        });
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                    papierDoneAlready = true;
+                    setTimeout(() => {
+                        papierDoneAlready = false;
+                    }, 60000);
                 }
             }
-            // else {
-            //     message.channel.send("Godzina dopiero nadejdzie");
-            //     console.log("Godzin: " + data.getHours());
-            //     console.log("Minut: " + data.getMinutes());
-            // }
         }
-    }, 20000)
+    }, 1000);
 });
 
 client.on('message', message => {
