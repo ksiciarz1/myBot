@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const { prefix, token, papierSwitch } = require('./config.json');
+const { prefix, token, papierSwitch, plebaniaGuild } = require('./config.json');
 const fs = require('fs');
 var splitedMessageContent;
 var papierSwitchLocal = papierSwitch;
@@ -101,7 +101,7 @@ client.once('ready', () => {
                 let data = new Date();
                 if (data.getHours() == 21 && data.getMinutes() == 37) {
                     console.log("Godzina bestii nadeszła !");
-                    let plebaniaGuild = client.guilds.cache.find(guild => guild.id == "442264233841786880");
+                    let plebaniaGuild = client.guilds.cache.find(guild => guild.id == plebaniaGuild);
                     let pliki = fs.readdirSync('./Resources/Papier/');
                     let messegesToSend = ["Godzina bestii nadeszła !!", "2137", "Papierz z nami tańczy !!"];
                     let fileToSend = "./Resources/Papier/" + pliki[Math.floor(Math.random() * pliki.length)];
